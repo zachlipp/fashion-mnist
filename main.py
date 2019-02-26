@@ -82,10 +82,11 @@ def main():
     logging.basicConfig(stream=sys.stdout, level=logging.INFO)
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
-    BATCH_SIZE = 128
-    LEARNING_RATE = 0.001
-    MOMENTUM = 0.9
-    EPOCHS = 1
+    BATCH_SIZE = int(os.getenv("BATCH_SIZE"))
+    LEARNING_RATE = float(os.getenv("LEARNING_RATE"))
+    MOMENTUM = float(os.getenv("MOMENTUM"))
+    EPOCHS = int(os.getenv("EPOCHS"))
+
     train, test = load_data(BATCH_SIZE)
     model = MultinomialLogistic()
     model.to(device)
