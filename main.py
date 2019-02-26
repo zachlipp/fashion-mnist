@@ -91,7 +91,6 @@ def main():
     model.to(device)
     fit_model(model, device, train, LEARNING_RATE, MOMENTUM, EPOCHS)
     assess_fit(model, device, test)
-    logging.info("I ran")
 
 
 if __name__ == "__main__":
