@@ -6,6 +6,7 @@ import torch
 import torchvision
 import torch.nn as nn
 import torch.optim as optim
+import torch.nn.functional as F
 from torch.utils.data import DataLoader
 from torchvision import transforms
 
@@ -30,9 +31,9 @@ def load_data(batch_size):
     return train_loader, test_loader
 
 
-class MultinomialLogistic(nn.Module):
+class ConvNet(nn.Module):
     def __init__(self):
-        super(MultinomialLogistic, self).__init__()
+        super(ConvNet, self).__init__()
         self.pool = nn.MaxPool2d(2, 2)
         self.conv1 = nn.Conv2d(1, 5, 3)
         self.bn1 = nn.BatchNorm2d(5)
@@ -96,7 +97,7 @@ def main():
     EPOCHS = int(os.getenv("EPOCHS"))
 
     train, test = load_data(BATCH_SIZE)
-    model = MultinomialLogistic()
+    model = ConvNet()
     model.to(device)
     fit_model(model, device, train, LEARNING_RATE, EPOCHS)
     assess_fit(model, device, test)
