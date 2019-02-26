@@ -79,6 +79,7 @@ def assess_fit(model, device, test):
 
 
 def main():
+    torch.manual_seed(1337)
     logging.basicConfig(stream=sys.stdout, level=logging.INFO)
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
