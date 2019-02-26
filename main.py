@@ -33,20 +33,23 @@ def load_data(batch_size):
 class MultinomialLogistic(nn.Module):
     def __init__(self):
         super(MultinomialLogistic, self).__init__()
-        self.fc = nn.Linear(28 * 28, 10)
+        self.pool = nn.MaxPool2d(2, 2)
+        self.conv1 = nn.Conv2d(1, 5, 3)
+        self.conv2 = nn.Conv2d(5, 20, 3)
+        self.fc = nn.Linear(5 * 5 * 20, 10)
 
     def forward(self, x):
-        x = x.view(-1, 28 * 28)
+        x = self.pool(F.relu(self.conv1(x)))
+        x = self.pool(F.relu(self.conv2(x)))
+        x = x.view(-1, 5 * 5 * 20)
         x = self.fc(x)
         return x
 
 
-def fit_model(model, device, train_loader, learning_rate, momentum, epochs):
+def fit_model(model, device, train_loader, learning_rate, epochs):
     logging.info("Fitting model...")
     loss = nn.CrossEntropyLoss()
-    optimizer = optim.SGD(
-        model.parameters(), lr=learning_rate, momentum=momentum
-    )
+    optimizer = optim.Adam(model.parameters(), lr=learning_rate)
     for epoch in range(epochs):
         running_loss = 0.0
         for i, data in enumerate(train_loader):
@@ -85,13 +88,12 @@ def main():
 
     BATCH_SIZE = int(os.getenv("BATCH_SIZE"))
     LEARNING_RATE = float(os.getenv("LEARNING_RATE"))
-    MOMENTUM = float(os.getenv("MOMENTUM"))
     EPOCHS = int(os.getenv("EPOCHS"))
 
     train, test = load_data(BATCH_SIZE)
     model = MultinomialLogistic()
     model.to(device)
-    fit_model(model, device, train, LEARNING_RATE, MOMENTUM, EPOCHS)
+    fit_model(model, device, train, LEARNING_RATE, EPOCHS)
     assess_fit(model, device, test)
 
 
