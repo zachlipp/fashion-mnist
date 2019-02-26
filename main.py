@@ -41,7 +41,7 @@ class MultinomialLogistic(nn.Module):
         return x
 
 
-def fit_model(model, train_loader, learning_rate, momentum, epochs):
+def fit_model(model, device, train_loader, learning_rate, momentum, epochs):
     logging.info("Fitting model...")
     loss = nn.CrossEntropyLoss()
     optimizer = optim.SGD(
@@ -51,6 +51,7 @@ def fit_model(model, train_loader, learning_rate, momentum, epochs):
         running_loss = 0.0
         for i, data in enumerate(train_loader):
             inputs, labels = data
+            inputs, labels = inputs.to(device), labels.to(device)
             optimizer.zero_grad()
             outputs = model(inputs)
             batch_loss = loss(outputs, labels)
@@ -62,13 +63,14 @@ def fit_model(model, train_loader, learning_rate, momentum, epochs):
     logging.info("Model fit!")
 
 
-def assess_fit(model, test):
+def assess_fit(model, device, test):
     logging.info("Assessing model...")
     with torch.no_grad():
         total = 0
         total_correct = 0
         for data in test:
             images, labels = data
+            images, labels = images.to(device), labels.to(device)
             outputs = model(images)
             _, predicted = torch.max(outputs, 1)
             total += labels.size(0)
@@ -78,14 +80,17 @@ def assess_fit(model, test):
 
 def main():
     logging.basicConfig(stream=sys.stdout, level=logging.INFO)
+    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+
     BATCH_SIZE = 128
     LEARNING_RATE = 0.001
     MOMENTUM = 0.9
     EPOCHS = 1
     train, test = load_data(BATCH_SIZE)
     model = MultinomialLogistic()
-    fit_model(model, train, LEARNING_RATE, MOMENTUM, EPOCHS)
-    assess_fit(model, test)
+    model.to(device)
+    fit_model(model, device, train, LEARNING_RATE, MOMENTUM, EPOCHS)
+    assess_fit(model, device, test)
     logging.info("I ran")
 
 
