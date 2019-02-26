@@ -35,12 +35,16 @@ class MultinomialLogistic(nn.Module):
         super(MultinomialLogistic, self).__init__()
         self.pool = nn.MaxPool2d(2, 2)
         self.conv1 = nn.Conv2d(1, 5, 3)
+        self.bn1 = nn.BatchNorm2d(5)
         self.conv2 = nn.Conv2d(5, 20, 3)
+        self.bn2 = nn.BatchNorm2d(20)
         self.fc = nn.Linear(5 * 5 * 20, 10)
 
     def forward(self, x):
         x = self.pool(F.relu(self.conv1(x)))
+        x = self.bn1(x)
         x = self.pool(F.relu(self.conv2(x)))
+        x = self.bn2(x)
         x = x.view(-1, 5 * 5 * 20)
         x = self.fc(x)
         return x
@@ -68,6 +72,7 @@ def fit_model(model, device, train_loader, learning_rate, epochs):
 
 def assess_fit(model, device, test):
     logging.info("Assessing model...")
+    model.eval()
     with torch.no_grad():
         total = 0
         total_correct = 0
