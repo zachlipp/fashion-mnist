@@ -1,0 +1,10 @@
+version: "2.3"
+services:
+  torch:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    runtime: nvidia
+    volumes:
+      - .:/workspace
+    container_name: torch
