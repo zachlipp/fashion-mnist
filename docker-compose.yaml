@@ -8,3 +8,5 @@ services:
     volumes:
       - .:/workspace
     container_name: torch
+    env_file:
+      - params.env
